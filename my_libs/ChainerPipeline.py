@@ -1,5 +1,8 @@
 import pandas as pd
 import json
+import os
+from datetime import datetime
+
 import chainer
 import chainer.links as L
 import chainer.functions as F
@@ -72,8 +75,8 @@ class ChainerPipeline:
         return model
     
     # 結果の可視化
-    def visualize_result(self, preprocess, network, setting, plot_learn=True):
-        with open('./result/cat_dog/log') as f:
+    def visualize_result(self, preprocess, network, setting, plot_learn=True, path='./result/cat_dog/'):
+        with open(os.path.join(path, 'log')) as f:
             result = pd.DataFrame(json.load(f))
 
         log = pd.Series()
@@ -83,7 +86,8 @@ class ChainerPipeline:
         log['Validation accuracy'] = result.iloc[-1]['validation/main/accuracy']
         log = log.append(pd.Series(setting))
         print(log)
-
+        log.to_json(os.path.join(path, 'run', '%s.json' % datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
+                  
         if plot_learn:
             result[['main/accuracy', 'validation/main/accuracy']].plot()
         return result

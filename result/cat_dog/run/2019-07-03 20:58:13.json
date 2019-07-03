@@ -1,0 +1,1 @@
+{"Preprocess":"MyProcessing","Model":"MyCNN","Elapsed time":112.843947702,"Validation accuracy":0.6833333373,"batch_size":16,"epoch":10,"use_gpu":true}
