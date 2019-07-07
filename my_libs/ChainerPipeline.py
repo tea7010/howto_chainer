@@ -22,7 +22,7 @@ class ChainerPipeline:
         self.train = train
         self.test = test
         self.setting = setting
-        
+
     def run(self):
         # 前処理
         train = self.preprocess.transform(self.train)
@@ -39,7 +39,12 @@ class ChainerPipeline:
     def chainer_model_pipe(self, nn, train, test, params):
         epoch = params['epoch']
         batch_size = params['batch_size']
-        use_gpu=params['use_gpu']
+        use_gpu = params['use_gpu']
+
+        if 'fixed_base_w' in params.keys():
+            fixed_base_w = params['fixed_base_w']
+        else:
+            fixed_base_w = False
 
         # Model Instance
         model = L.Classifier(nn)
@@ -58,6 +63,9 @@ class ChainerPipeline:
         optimizer = Adam()
         optimizer.setup(model)
 
+        if fixed_base_w:
+            model.predictor.base.disable_update()
+
         updater = StandardUpdater(train_iter, optimizer, device=device)
 
         trainer = Trainer(updater, (epoch, 'epoch'), out='result/cat_dog')
@@ -75,7 +83,7 @@ class ChainerPipeline:
         return model
     
     # 結果の可視化
-    def visualize_result(self, preprocess, network, setting, plot_learn=True, path='./result/cat_dog/'):
+    def visualize_result(self, preprocess, network, setting, plot_learn=False, path='./result/cat_dog/'):
         with open(os.path.join(path, 'log')) as f:
             result = pd.DataFrame(json.load(f))
 

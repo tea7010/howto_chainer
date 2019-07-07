@@ -1,1 +1,1 @@
-This repository is my learning memo of Chainer training.
+Chainerチュートリアル・実習用のレポジトリ

@@ -15,11 +15,47 @@ class CNN_1(chainer.Chain):
                                         pad=1)
             self.fc1 = L.Linear(None, n_mid)
             self.fco = L.Linear(None, n_out)
-            
+           
     def __call__(self, x):
         h = self.cnv1(x)
         h = F.relu(h)
         h = F.max_pooling_2d(h, 3, 3)
         h = self.fc1(h)
         h = self.fco(h)
+        return h
+
+class VGG(chainer.Chain):
+    def __init__(self, n_out=2):
+        super().__init__()
+
+        with self.init_scope():
+            self.base = L.VGG16Layers()
+            self.fc8 = L.Linear(None, n_out)
+
+    def __call__(self, x):
+        h = self.base(x, layers=['fc7'])['fc7']
+        h = self.fc8(h)
+        return h
+
+class VGG_2(chainer.Chain):
+    def __init__(self, n_out=2):
+        super().__init__()
+
+        with self.init_scope():
+            self.base = L.VGG16Layers()
+            self.fc6 = L.Linear(None, 4096)
+            self.fc7 = L.Linear(None, 512)
+            self.fc8 = L.Linear(None, n_out)
+
+    def __call__(self, x):
+        h = self.base(x, layers=['pool5'])['pool5']
+
+        h = self.fc6(h)
+        h = F.relu(h)
+        h = F.dropout(h)
+
+        h = self.fc7(h)
+        h = F.relu(h)
+
+        h = self.fc8(h)
         return h
