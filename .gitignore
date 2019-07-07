@@ -5,6 +5,8 @@ __pycache__/
 # C extensions
 *.so
 
+result/cat_dog/log
+
 # Distribution / packaging
 .Python
 build/

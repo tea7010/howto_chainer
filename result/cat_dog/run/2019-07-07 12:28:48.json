@@ -1,0 +1,1 @@
+{"Preprocess":"Processing_3","Model":"VGG","Elapsed time":214.370978061,"Validation accuracy":0.6958333254,"batch_size":16,"epoch":10,"fixed_base_w":true,"use_gpu":true}

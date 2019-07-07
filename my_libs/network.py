@@ -59,3 +59,17 @@ class VGG_2(chainer.Chain):
 
         h = self.fc8(h)
         return h
+
+class Resnet(chainer.Chain):
+    def __init__(self, n_out=2):
+        super().__init__()
+
+        with self.init_scope():
+            self.base = L.ResNet152Layers()
+            self.fc7 = L.Linear(None, n_out)
+
+    def __call__(self, x):
+        h = self.base(x, layers=['fc6'])['fc6']
+        h = self.fc7(h)
+        return h
+
