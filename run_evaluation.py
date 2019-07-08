@@ -15,10 +15,10 @@ if __name__ == '__main__':
     import my_libs.preprocess as my_process
 
     setting = {
-        'epoch': 100,
+        'epoch': 10,
         'batch_size': 32,
         'use_gpu': True,
         'fixed_base_w': True
     }
 
-    run_evaluation(my_process.Processing_3(), my_net.VGG(), setting)
+    run_evaluation(my_process.Processing_4(), my_net.VGG(), setting)
