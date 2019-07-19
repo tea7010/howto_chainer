@@ -2,7 +2,7 @@ import numpy as np
 import chainer
 from chainer.datasets import LabeledImageDataset
 from chainer.datasets import TransformDataset
-from chainercv.transforms import resize
+from chainercv.transforms import resize, random_flip, random_crop, random_sized_crop, random_flip
 
 class Processing_1:
     def __init__(self):
@@ -157,3 +157,18 @@ class Processing_10:
         
         return TransformDataset(dataset, normarize)
 
+class Processing_11:
+    def __init__(self):
+        pass
+    
+    def transform(self, x):
+        dataset = LabeledImageDataset(x)
+
+        def _transform(in_data):
+            img, label = in_data
+            img = random_sized_crop(img, scale_ratio_range=(0.3, 1))
+            img = random_flip(img, x_random=True)
+            img = chainer.links.model.vision.vgg.prepare(img)
+            return img, label
+        
+        return TransformDataset(dataset, _transform)

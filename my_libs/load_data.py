@@ -29,6 +29,8 @@ def load_new_dataset(data_dir):
     train_cats = glob(os.path.join(data_dir, 'train/cat/*.jpg'))
     valid_dogs = glob(os.path.join(data_dir, 'validation/dog/*.jpg'))
     valid_cats = glob(os.path.join(data_dir, 'validation/cat/*.jpg'))
+    test_dogs = glob(os.path.join(data_dir, 'test_v2/dog/*.jpg'))
+    test_cats = glob(os.path.join(data_dir, 'test_v2/cat/*.jpg'))
 
     # 教師ラベルの作成
     train_label = {
@@ -36,19 +38,19 @@ def load_new_dataset(data_dir):
         'dog': 0}
 
     df = pd.DataFrame({
-        'file_path': train_cats + train_dogs + valid_dogs + valid_cats,
+        'file_path': train_cats + train_dogs + valid_dogs + valid_cats + test_dogs + test_cats,
     })
     df['label'] = df['file_path'].str.split('/', expand=True)[5]
     df['dataset'] = df['file_path'].str.split('/', expand=True)[4]
     df['target'] = df['label'].replace(train_label)
     
     # データセットを作成
-    train_df = df[df['dataset'] == 'train'].copy()
-    valid_df = df[df['dataset'] == 'validation'].copy()
-    ### indexをリセットしないとエラー出る！！！！
-    valid_df = valid_df.reset_index()
+    train_df = df[df['dataset'] == 'train']
+    valid_df = df[df['dataset'] == 'validation']
+    test_df = df[df['dataset'] == 'test_v2']
 
-    train = TupleDataset(train_df['file_path'], train_df['target'].astype('int32'))
-    valid = TupleDataset(valid_df['file_path'], valid_df['target'].astype('int32'))
+    train = TupleDataset(train_df['file_path'].values, train_df['target'].values.astype('int32'))
+    valid = TupleDataset(valid_df['file_path'].values, valid_df['target'].values.astype('int32'))
+    test = TupleDataset(test_df['file_path'].values, test_df['target'].values.astype('int32'))
 
-    return train, valid
+    return train, valid, test

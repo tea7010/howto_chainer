@@ -15,28 +15,28 @@ from chainer.training.extensions import Evaluator, LogReport, PrintReport
 
 
 class ChainerPipeline:
-    def __init__(self, preprocess, network, train, test, setting):
+    def __init__(self, preprocess, network, train, valid, setting):
         self.preprocess = preprocess
         self.network = network
         
         self.train = train
-        self.test = test
+        self.valid = valid
         self.setting = setting
 
     def run(self):
         # 前処理
         train = self.preprocess.transform(self.train)
-        test = self.preprocess.transform(self.test)
+        valid = self.preprocess.transform(self.valid)
 
         # モデル学習・評価
-        model = self.chainer_model_pipe(self.network, train, test, self.setting)
+        model = self.chainer_model_pipe(self.network, train, valid, self.setting)
 
         # 結果可視化
         result = self.visualize_result(self.preprocess, self.network, self.setting)
         return model, result
     
     # chainerモデルのパイプライン
-    def chainer_model_pipe(self, nn, train, test, params):
+    def chainer_model_pipe(self, nn, train, valid, params):
         epoch = params['epoch']
         batch_size = params['batch_size']
         use_gpu = params['use_gpu']
@@ -57,7 +57,7 @@ class ChainerPipeline:
 
         # ミニバッチのインスタンスを作成
         train_iter = SerialIterator(train, batch_size)
-        test_iter = SerialIterator(test, batch_size, repeat=False, shuffle=False)
+        valid_iter = SerialIterator(valid, batch_size, repeat=False, shuffle=False)
 
         # Set Lerning
         optimizer = Adam()
@@ -69,7 +69,7 @@ class ChainerPipeline:
         updater = StandardUpdater(train_iter, optimizer, device=device)
 
         trainer = Trainer(updater, (epoch, 'epoch'), out='result/cat_dog')
-        trainer.extend(Evaluator(test_iter, model, device=device))
+        trainer.extend(Evaluator(valid_iter, model, device=device))
         trainer.extend(LogReport(trigger=(1, 'epoch')))
         trainer.extend(PrintReport(['epoch', 'main/accuracy', 'validation/main/accuracy', 
                                     'main/loss', 'validation/main/loss', 'elapsed_time']), 

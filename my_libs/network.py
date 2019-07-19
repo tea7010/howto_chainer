@@ -2,6 +2,8 @@ import chainer
 import chainer.links as L
 import chainer.functions as F
 from chainer.datasets import LabeledImageDataset
+from chainercv.links.model.resnet import ResNet50
+from chainer.links.caffe import CaffeFunction
 
 
 class CNN_1(chainer.Chain):
@@ -71,14 +73,11 @@ class VGG_2(chainer.Chain):
 
     def __call__(self, x):
         h = self.base(x, layers=['pool5'])['pool5']
-
         h = self.fc6(h)
         h = F.relu(h)
         h = F.dropout(h)
-
         h = self.fc7(h)
         h = F.relu(h)
-
         h = self.fc8(h)
         return h
 
@@ -94,26 +93,22 @@ class VGG_3(chainer.Chain):
 
     def __call__(self, x):
         h = self.base(x, layers=['pool5'])['pool5']
-
         h = self.fc6(h)
         h = F.relu(h)
-
         h = self.fc7(h)
         h = F.relu(h)
-
         h = self.fc8(h)
         return h
 
-class Resnet(chainer.Chain):
+class Resnet50(chainer.Chain):
     def __init__(self, n_out=2):
         super().__init__()
 
         with self.init_scope():
-            self.base = L.ResNet152Layers()
+            self.base = ResNet50()
             self.fc7 = L.Linear(None, n_out)
 
     def __call__(self, x):
         h = self.base(x, layers=['fc6'])['fc6']
         h = self.fc7(h)
         return h
-
